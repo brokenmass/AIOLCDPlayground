@@ -44,7 +44,7 @@ const parameters = {
   screenSize: {
     property: 'screenSize',
     group: '',
-    label: 'ScreenSize',
+    label: 'Screen Size',
     step: '1',
     type: 'number',
     min: '1',
@@ -70,7 +70,7 @@ const parameters = {
   composition: {
     property: 'composition',
     group: '',
-    label: 'Composition mode',
+    label: 'Composition Mode',
     type: 'combobox',
     values: ['OFF', 'OVERLAY', 'MIX'],
     default: 'OVERLAY',
@@ -96,21 +96,21 @@ const parameters = {
   textOverlay: {
     property: 'textOverlay',
     group: '',
-    label: 'Text overlay',
+    label: 'Enable Text Overlay',
     type: 'boolean',
     default: true,
   },
   titleText: {
     property: 'titleText',
     group: '',
-    label: 'titleText',
+    label: 'Title Text',
     type: 'textfield',
     default: 'SignalRGB',
   },
   titleFontSize: {
     property: 'titleFontSize',
     group: '',
-    label: 'titleFontSize',
+    label: 'Title Font Size',
     step: 1,
     type: 'number',
     min: 10,
@@ -120,7 +120,7 @@ const parameters = {
   sensorFontSize: {
     property: 'sensorFontSize',
     group: '',
-    label: 'sensorFontSize',
+    label: 'Sensor Font Size',
     step: 1,
     type: 'number',
     min: 10,
@@ -130,14 +130,29 @@ const parameters = {
   sensorLabelFontSize: {
     property: 'sensorLabelFontSize',
     group: '',
-    label: 'sensorLabelFontSize',
+    label: 'Sensor Label Font Size',
     step: 1,
     type: 'number',
     min: 10,
     max: 200,
     default: 40,
   },
+  musicOverlay: {
+    property: 'musicOverlay',
+    group: '',
+    label: 'Enable Cider Overlay',
+    type: 'boolean',
+    default: true,
+  },
+  musicToken: {
+    property: 'musicToken',
+    group: '',
+    label: 'Cider App Token',
+    type: 'textfield',
+    default: 'YOUR_APP_TOKEN',
+  },
 };
+
 export function ControllableParameters() {
   return [
     parameters.fps,
@@ -179,22 +194,44 @@ export function oncompositionChanged() {
     device.removeProperty('overlayTransparency');
     device.removeProperty('spinner');
     device.removeProperty('textOverlay');
+    device.removeProperty('musicOverlay');
   } else {
     device.addProperty(parameters.overlayTransparency);
     device.addProperty(parameters.spinner);
     device.addProperty(parameters.textOverlay);
+    device.addProperty(parameters.musicOverlay);
   }
 
   ontextOverlayChanged();
+  onmusicOverlayChanged();
+}
+
+export function onmusicOverlayChanged() {
+  if (device.getProperty('musicOverlay')?.value) {
+    device.addProperty(parameters.musicToken);
+    device.removeProperty('textOverlay');
+    device.removeProperty('sensorFontSize');
+    device.removeProperty('sensorLabelFontSize');
+  } else {
+    device.removeProperty('musicToken');
+    if (!device.getProperty('textOverlay')?.value) {
+      device.addProperty(parameters.textOverlay);
+    }
+  }
 }
 
 export function ontextOverlayChanged() {
   if (device.getProperty('textOverlay')?.value) {
     device.addProperty(parameters.titleText);
     device.addProperty(parameters.titleFontSize);
-    device.addProperty(parameters.sensorFontSize);
-    device.addProperty(parameters.sensorLabelFontSize);
+    if (!device.getProperty('musicOverlay')?.value) {
+      device.removeProperty('musicOverlay');
+      device.removeProperty('musicToken');
+      device.addProperty(parameters.sensorFontSize);
+      device.addProperty(parameters.sensorLabelFontSize);
+    }
   } else {
+    device.addProperty(parameters.musicOverlay);
     device.removeProperty('titleText');
     device.removeProperty('titleFontSize');
     device.removeProperty('sensorFontSize');
@@ -244,6 +281,8 @@ export function Render() {
     titleFontSize: device.getProperty('titleFontSize')?.value,
     sensorFontSize: device.getProperty('sensorFontSize')?.value,
     sensorLabelFontSize: device.getProperty('sensorLabelFontSize')?.value,
+    musicOverlay: device.getProperty('musicOverlay')?.value ?? false,
+    musicToken: device.getProperty('musicToken')?.value,
   };
   const fpsConfig = device.getProperty('fps')?.value;
   if (Number(fpsConfig)) {
