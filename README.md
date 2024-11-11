@@ -27,7 +27,9 @@ WARNING: i'm not responsible for any damage to your equipment. If anything get s
   - [ ] Dynamic text
   - [ ] Clock
   - [ ] Music ticket
+  - [x] [Cider](https://cider.sh) Integration
 - Devices:
+  - [x] NZXT Kraken 2024 Elite
   - [x] NZXT Kraken 2023 Elite
   - [ ] NZXT Kraken 2023
   - [x] NZXT Kraken Z3
