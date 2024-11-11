@@ -262,8 +262,8 @@ class OverlayProducer(Thread):
             self.musicInfo['artist'] = info.get('artistName', '')
             self.musicInfo['album'] = info.get('albumName', '')
             artwork_url = info.get('artwork', {}).get('url')
-            print('Now playing:', self.musicInfo)
             if artwork_url:
+                artwork_url = artwork_url.replace('512x512bb', '1024x1024bb').replace('{w}x{h}bb', '1024x1024bb')
                 try:
                     response = requests.get(artwork_url)
                     self.musicInfo['image'] = Image.open(BytesIO(response.content)).convert('RGBA')
